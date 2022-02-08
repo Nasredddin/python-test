@@ -4,26 +4,34 @@
 import random
 import string
 import smtplib
-
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from platform import python_version
 
-for i in range(10):
 
+def generate_text():
     length = 10
     letters = string.ascii_letters + string.digits
     rand_string = ''.join(random.choice(letters) for q in range(length))
-    print(rand_string)
+    return rand_string
 
+
+def generate_subject():
+    length = 10
+    letters = string.ascii_letters + string.digits
+    rand_string = ''.join(random.choice(letters) for q in range(length))
+    return rand_string
+
+
+for i in range(10):
     server = 'smtp.gmail.com'
     user = 'gavrilov.3.nikita@gmail.com'
     password = 'WARface2002'
 
     recipients = ['sterben.300.list@gmail.com', 'gavrilov.3.nikita@gmail.com']
     sender = 'gavrilov.3.nikita@gmail.com'
-    subject = 'Hello world'
-    text = f'{rand_string}'
+    subject = f'{generate_subject()}'
+    text = f'{generate_text()}'
     html = '<html><head></head><body><p>' + text + '</p></body></html>'
 
     msg = MIMEMultipart('alternative')
