@@ -24,11 +24,10 @@ def send_mails():
         rand_string = ''.join(random.choice(letters) for q in range(length))
         return rand_string
 
+    server = 'smtp.gmail.com'
+    user = 'sterben.300.nikita@gmail.com'
+    password = 'TrustNO1&'
     for i in range(15):
-        server = 'smtp.gmail.com'
-        user = 'sterben.300.nikita@gmail.com'
-        password = 'TrustNO1&'
-
         recipients = ['sterben.300.nikita@gmail.com']
         sender = 'sterben.300.nikita@gmail.com'
         send_subject = f'{generate_subject()}'
@@ -52,7 +51,7 @@ def send_mails():
         mail.quit()
 
 
-def main_send_mail():
+def final_sms():
     server = 'smtp.gmail.com'
     user = 'sterben.300.nikita@gmail.com'
     password = 'TrustNO1&'
@@ -89,30 +88,29 @@ def main_send_mail():
 
     msg.attach(part_text)
 
-    mail = smtplib.SMTP_SSL(server)
-    mail.login(user, password)
-    mail.sendmail(sender, recipients, msg.as_string())
-    mail.quit()
+    final_mail = smtplib.SMTP_SSL(server)
+    final_mail.login(user, password)
+    final_mail.sendmail(sender, recipients, msg.as_string())
+    final_mail.quit()
 
 
 send_mails()
 
 
+# This block connects to mailbox
+mail = imaplib.IMAP4_SSL('imap.gmail.com')
+mail.login('sterben.300.nikita@gmail.com', 'TrustNO1&')
+
+mail.list()
+mail.select("inbox")
+
+# This block reads the last mail in mailbox
 global text
 mail_num = -1
 mane_dict = {}
 for i in range(15):
-    # This block connects to mailbox
-    mail = imaplib.IMAP4_SSL('imap.gmail.com')
-    mail.login('sterben.300.nikita@gmail.com', 'TrustNO1&')
-
-    mail.list()
-    mail.select("inbox")
-
-    # This block reads the last mail in mailbox
-
     result, data = mail.search(None, "ALL")
-
+    print(f'Search is {result}')
     ids = data[0]
     id_list = ids.split()
     latest_email_id = id_list[mail_num]
@@ -124,17 +122,14 @@ for i in range(15):
     raw_email_string = raw_email.decode('utf-8')
 
     # This block reads and print the subject and text of last mail
-
     email_message = email.message_from_string(raw_email_string)
     for payload in email_message.get_payload():
         text = payload.get_payload(decode=True).decode('utf-8')
 
     # This block creates dict, where keys are Subject and values are Text
-
     mane_dict.update({email_message['Subject']: text})
 
 # This block counts letters and numbers in value from dict
-
 main_list = list(mane_dict.values())
 values = {'letters': 0, 'numbers': 0}
 score = 0
@@ -158,3 +153,21 @@ for i in range(15):
     final_text.append(f'Received mail on theme ({dict_keys[x]}) with message: {dict_values[x]}. '
                       f'It contains {report[x][0]} letters and {report[x][1]} numbers')
     x += 1
+
+
+def delete_mails():
+    mail = imaplib.IMAP4_SSL('imap.gmail.com')
+    mail.login('sterben.300.nikita@gmail.com', 'TrustNO1&')
+
+    mail.list()
+    mail.select("inbox")
+    typ, data = mail.search(None, 'ALL')
+    while len(data[0]) > 1:
+        for num in data[0].split():
+            mail.store(num, '+FLAGS', '\\Deleted')
+            mail.expunge()
+        typ, data = mail.search(None, 'ALL')
+
+
+final_sms()
+delete_mails()
