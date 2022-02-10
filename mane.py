@@ -24,7 +24,7 @@ def send_mails():
         rand_string = ''.join(random.choice(letters) for q in range(length))
         return rand_string
 
-    for i in range(3):
+    for i in range(15):
         server = 'smtp.gmail.com'
         user = 'sterben.300.nikita@gmail.com'
         password = 'TrustNO1&'
@@ -52,13 +52,56 @@ def send_mails():
         mail.quit()
 
 
-# send_mails()
+def main_send_mail():
+    server = 'smtp.gmail.com'
+    user = 'sterben.300.nikita@gmail.com'
+    password = 'TrustNO1&'
+
+    recipients = ['sterben.300.nikita@gmail.com']
+    sender = 'sterben.300.nikita@gmail.com'
+    send_subject = 'The final of test'
+    send_text = (f'{final_text[0]}\n'
+                 f'{final_text[1]}\n'
+                 f'{final_text[2]}\n'
+                 f'{final_text[3]}\n'
+                 f'{final_text[4]}\n'
+                 f'{final_text[5]}\n'
+                 f'{final_text[6]}\n'
+                 f'{final_text[7]}\n'
+                 f'{final_text[8]}\n'
+                 f'{final_text[9]}\n'
+                 f'{final_text[10]}\n'
+                 f'{final_text[11]}\n'
+                 f'{final_text[14]}\n'
+                 f'{final_text[13]}\n'
+                 f'{final_text[14]}\n'
+                 )
+
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = send_subject
+    msg['From'] = 'Python script <' + sender + '>'
+    msg['To'] = ', '.join(recipients)
+    msg['Reply-To'] = sender
+    msg['Return-Path'] = sender
+    msg['X-Mailer'] = 'Python/' + (python_version())
+
+    part_text = MIMEText(send_text, 'plain')
+
+    msg.attach(part_text)
+
+    mail = smtplib.SMTP_SSL(server)
+    mail.login(user, password)
+    mail.sendmail(sender, recipients, msg.as_string())
+    mail.quit()
+
+
+send_mails()
 
 
 global text
 mail_num = -1
 mane_dict = {}
-for i in range(3):
+for i in range(15):
     # This block connects to mailbox
     mail = imaplib.IMAP4_SSL('imap.gmail.com')
     mail.login('sterben.300.nikita@gmail.com', 'TrustNO1&')
@@ -89,20 +132,29 @@ for i in range(3):
     # This block creates dict, where keys are Subject and values are Text
 
     mane_dict.update({email_message['Subject']: text})
-print(mane_dict)
 
 # This block counts letters and numbers in value from dict
 
 main_list = list(mane_dict.values())
 values = {'letters': 0, 'numbers': 0}
 score = 0
-for i in range(len(main_list)):
+report = []
+for i in range(15):
     for q in main_list[score]:
         if q.isalpha():
             values['letters'] += 1
         elif q.isdigit():
             values['numbers'] += 1
-    print(values)
+    report.append((values['letters'], values['numbers']))
     values['letters'] = 0
     values['numbers'] = 0
     score += 1
+
+dict_keys = list(mane_dict.keys())
+dict_values = list(mane_dict.values())
+final_text = []
+x = 0
+for i in range(15):
+    final_text.append(f'Received mail on theme ({dict_keys[x]}) with message: {dict_values[x]}. '
+                      f'It contains {report[x][0]} letters and {report[x][1]} numbers')
+    x += 1
